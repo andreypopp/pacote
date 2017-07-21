@@ -14,9 +14,7 @@ require('./util/test-dir')(__filename)
 
 npmlog.level = process.env.LOGLEVEL || 'silent'
 
-test('accepts gid and uid opts', {
-  skip: !process.getuid
-}, function (t) {
+test('accepts gid and uid opts', {skip: !process.getuid}, t => {
   const pkg = {
     'package.json': {
       data: JSON.stringify({
@@ -32,6 +30,7 @@ test('accepts gid and uid opts', {
   process.getuid = () => 0
   const updatedPaths = []
   const fsClone = Object.create(fs)
+  fsClone.utimes = () => {}
   fsClone.chown = (p, uid, gid, cb) => {
     process.nextTick(() => {
       t.deepEqual({
@@ -49,7 +48,7 @@ test('accepts gid and uid opts', {
     fs: fsClone
   })
   return mockTar(pkg, {stream: true}).then(tarStream => {
-    return pipe(tarStream, extractStream('./target', {
+    return pipe(tarStream, extractStream('.', {
       uid: NEWUID,
       gid: NEWGID,
       log: npmlog
