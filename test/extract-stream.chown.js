@@ -52,7 +52,7 @@ test('accepts gid and uid opts', {skip: !process.getuid}, t => {
       uid: NEWUID,
       gid: NEWGID,
       log: npmlog
-    }))
+    }).on('close', () => console.log('extractStream finished')))
   }).then(() => {
     t.deepEqual(updatedPaths, [
       'target',
